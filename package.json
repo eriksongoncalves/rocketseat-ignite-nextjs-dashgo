@@ -10,6 +10,11 @@
     "prettier": "prettier --check '*/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@chakra-ui/core": "^0.8.0",
+    "@chakra-ui/react": "^1.4.2",
+    "@emotion/react": "^11.1.5",
+    "@emotion/styled": "^11.1.5",
+    "framer-motion": "^4.1.2",
     "next": "10.0.9",
     "react": "17.0.2",
     "react-dom": "17.0.2"
