@@ -21,7 +21,8 @@ function SignIn() {
     resolver: yupResolver(signInFormSchema)
   });
 
-  const handleSignIn: SubmitHandler<SignInFormData> = values => {
+  const handleSignIn: SubmitHandler<SignInFormData> = async values => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
     // eslint-disable-next-line no-console
     console.log(values);
   };
