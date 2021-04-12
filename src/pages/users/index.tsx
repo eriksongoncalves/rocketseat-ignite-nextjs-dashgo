@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import {
@@ -23,14 +23,13 @@ import { Header, Pagination, Sidebar } from '../../components';
 import { useUsers } from '../../services/hooks/useUsers';
 
 function UserList() {
+  const [page, setPage] = useState(1);
   const router = useRouter();
-  const { data, isLoading, isFetching, error } = useUsers();
+  const { data, isLoading, isFetching, error } = useUsers(page);
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true
   });
-
-  useEffect(() => {}, []);
 
   return (
     <Box>
@@ -90,7 +89,7 @@ function UserList() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data?.map(user => (
+                  {data?.users.map(user => (
                     <Tr key={user.id}>
                       <Td px={['4', '4', '6']} color="gray.600" width="8">
                         <Checkbox colorScheme="pink" />
@@ -125,7 +124,12 @@ function UserList() {
                   ))}
                 </Tbody>
               </Table>
-              <Pagination />
+
+              <Pagination
+                totalCountOfRegisters={data!.totalCount}
+                currentPage={page}
+                onPageChange={setPage}
+              />
             </>
           )}
         </Box>
