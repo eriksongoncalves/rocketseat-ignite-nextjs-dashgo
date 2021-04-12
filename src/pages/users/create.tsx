@@ -13,8 +13,11 @@ import {
   HStack,
   Button
 } from '@chakra-ui/react';
+import { useMutation } from 'react-query';
 
 import { Header, Sidebar, Input } from '../../components';
+import { api } from '../../services/api';
+import { queryClient } from '../../services/queryClient';
 
 type CreateUserData = {
   name: string;
@@ -37,15 +40,31 @@ const createUserSchema = yup.object().shape({
 
 function CreateUser() {
   const router = useRouter();
+  const createUser = useMutation(
+    async (user: CreateUserData) => {
+      const response = await api.post('users', {
+        user: {
+          ...user,
+          created_at: new Date()
+        }
+      });
+
+      return response.data.user;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('users');
+      }
+    }
+  );
+
   const { register, handleSubmit, formState } = useForm<CreateUserData>({
     resolver: yupResolver(createUserSchema)
   });
 
   const handleCreateUser: SubmitHandler<CreateUserData> = async values => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // eslint-disable-next-line no-console
-    console.log(values);
+    await createUser.mutateAsync(values);
+    router.push('/users');
   };
 
   return (
