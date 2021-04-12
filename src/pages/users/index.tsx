@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import {
@@ -16,11 +16,14 @@ import {
   Td,
   Text,
   useBreakpointValue,
-  Spinner
+  Spinner,
+  Link
 } from '@chakra-ui/react';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { Header, Pagination, Sidebar } from '../../components';
 import { useUsers } from '../../services/hooks/useUsers';
+import { queryClient } from '../../services/queryClient';
+import { api } from '../../services/api';
 
 function UserList() {
   const [page, setPage] = useState(1);
@@ -30,6 +33,19 @@ function UserList() {
     base: false,
     lg: true
   });
+
+  const handlePrefetchUser = useCallback(async (userId: string) => {
+    await queryClient.prefetchQuery(
+      ['user', userId],
+      async () => {
+        const response = await api.get(`users/${userId}`);
+        return response.data;
+      },
+      {
+        staleTime: 1000 * 60 * 10
+      }
+    );
+  }, []);
 
   return (
     <Box>
@@ -96,7 +112,12 @@ function UserList() {
                       </Td>
                       <Td>
                         <Box>
-                          <Text fontWeight="bold">{user.name}</Text>
+                          <Link
+                            color="purple.400"
+                            onMouseEnter={() => handlePrefetchUser(user.id)}
+                          >
+                            <Text fontWeight="bold">{user.name}</Text>
+                          </Link>
                           <Text fontSize="sm" color="gray.300">
                             {user.email}
                           </Text>
