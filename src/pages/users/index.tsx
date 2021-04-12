@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useQuery } from 'react-query';
 import {
   Box,
   Flex,
@@ -21,43 +20,11 @@ import {
 } from '@chakra-ui/react';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { Header, Pagination, Sidebar } from '../../components';
-import { api } from '../../services/api';
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-};
-
-type Data = {
-  users: User[];
-};
+import { useUsers } from '../../services/hooks/useUsers';
 
 function UserList() {
   const router = useRouter();
-  const { data, isLoading, isFetching, error } = useQuery(
-    'users',
-    async () => {
-      const { data: userData } = await api.get<Data>('users');
-
-      const users = userData.users.map(user => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        created_at: new Date(user.createdAt).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        })
-      }));
-
-      return users;
-    },
-    {
-      staleTime: 1000 * 60 * 5
-    }
-  );
+  const { data, isLoading, isFetching, error } = useUsers();
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true
@@ -138,7 +105,7 @@ function UserList() {
                       </Td>
                       {isWideVersion && (
                         <>
-                          <Td>{user.created_at}</Td>
+                          <Td>{user.createdAt}</Td>
                           <Td>
                             <Button
                               as="a"
