@@ -21,14 +21,25 @@ import {
 } from '@chakra-ui/react';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { Header, Pagination, Sidebar } from '../../components';
-import { useUsers } from '../../services/hooks/useUsers';
+import {
+  getUsers,
+  useUsers,
+  GetUsersResponse
+} from '../../services/hooks/useUsers';
 import { queryClient } from '../../services/queryClient';
 import { api } from '../../services/api';
+import { GetServerSideProps } from 'next';
 
-function UserList() {
+type UserListProps = {
+  users: GetUsersResponse;
+};
+
+function UserList({ users }: UserListProps) {
   const [page, setPage] = useState(1);
   const router = useRouter();
-  const { data, isLoading, isFetching, error } = useUsers(page);
+  const { data, isLoading, isFetching, error } = useUsers(page, {
+    initialData: users
+  });
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true
@@ -158,5 +169,15 @@ function UserList() {
     </Box>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const data = await getUsers(1);
+
+  return {
+    props: {
+      users: data
+    }
+  };
+};
 
 export default UserList;
